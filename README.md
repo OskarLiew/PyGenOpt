@@ -7,7 +7,8 @@ A simple package for genetic optimization in python.
 To install from source code:
 
 `git clone https://github.com/OskarLiew/PyGenOpt.git`
-`pip install PyGenOpt`
+
+`pip install PyGenOpt/`
 
 Pip package might come later.
 
