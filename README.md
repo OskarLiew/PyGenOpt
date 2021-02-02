@@ -10,7 +10,7 @@ To install from source code:
 
 `pip install PyGenOpt/`
 
-Pip package might come later.
+Package might be uploaded to PyPi repository later.
 
 ## Usage
 
