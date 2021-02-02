@@ -1,22 +1,3 @@
-# PyGenOpt
-
-A simple package for genetic optimization in python.
-
-## Installation
-
-To install from source code:
-
-`git clone https://github.com/OskarLiew/PyGenOpt.git`
-
-`pip install PyGenOpt/`
-
-Pip package might come later.
-
-## Usage
-
-Example code to maximize bic by selecting variables of a linear regression model:
-
-```python
 import statsmodels.api as sm
 from genopt import GeneticOptimizer
 from functools import partial
@@ -66,5 +47,3 @@ X_subset = get_X_subset(best_chromosome, X)
 lr = sm.OLS(y, X_subset)
 results = lr.fit()
 print(results.summary())
-
-```
