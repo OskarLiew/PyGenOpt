@@ -1,19 +1,19 @@
 import numpy as np
+from numpy.core.fromnumeric import var
 
 
-def decode(population, n_vars, encoding, var_range, var_size):
+def decode_discrete(population, n_vars, var_range, var_size):
     # Special case where there is no need to decode
-    if (
-        var_range[0] == 0 and var_range[1] == 1 and var_size == 1
-    ) or encoding == "real":
+    if var_range[0] == 0 and var_range[1] == 1 and var_size == 1:
         return population
 
-    population = population.reshape((-1, n_vars * var_size))
+    population = np.atleast_2d(population.copy())
     popsize = population.shape[0]
     decoded = np.zeros((popsize, n_vars))
     var_min = var_range[0]
     var_max = var_range[1]
 
+    # Has room for optimization
     for i_indiv in range(popsize):
         for i_var in range(n_vars):
             var_bits = population[
@@ -29,13 +29,9 @@ def decode(population, n_vars, encoding, var_range, var_size):
     return decoded
 
 
-def evaluate_pop(population, n_vars, objective_function, var_range, var_size, encoding):
-    if encoding == "discrete":
-        variables = decode(population, n_vars, encoding, var_range, var_size)
-    else:
-        variables = population
-
-    popsize = population.shape[0]
+def evaluate(variables, objective_function):
+    variables = np.atleast_2d(variables.copy())
+    popsize = variables.shape[0]
     fitness = [objective_function(variables[i, :]) for i in range(popsize)]
     i_max = np.argmax(fitness)
     return np.array(fitness), i_max

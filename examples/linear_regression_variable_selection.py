@@ -1,6 +1,8 @@
 from functools import partial
 import statsmodels.api as sm
+from sklearn import datasets
 import numpy as np
+import pandas as pd
 from genopt import GeneticOptimizer
 
 
@@ -22,12 +24,10 @@ def linear_regression_minimize_bic(chromosome, X, y):
     return -results.bic
 
 
-# Load data. There are not very many variables in this dataset, so there
-# is a large chanse that the best subset is found in the first generation
-data = sm.datasets.longley.load_pandas()
-X = sm.add_constant(data.exog)
-y = data.endog
-feature_names = X.columns
+# Load Boston housing dataset
+data = datasets.load_boston()
+X = pd.DataFrame(data=data["data"], columns=data["feature_names"])
+y = data["target"]
 
 # Setup GeneticOptimizer
 go = GeneticOptimizer(
