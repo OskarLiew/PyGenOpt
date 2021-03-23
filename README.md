@@ -14,7 +14,7 @@ Package might be uploaded to PyPi repository later.
 
 ## Usage
 
-Example code to maximize bic by selecting variables of a linear regression model:
+Example code to minimize [BIC](https://en.wikipedia.org/wiki/Bayesian_information_criterion) by selecting variables of a linear regression model:
 
 ```python
 from functools import partial
@@ -42,7 +42,7 @@ def linear_regression_minimize_bic(chromosome, X, y):
 
 
 # Load data. There are not very many variables in this dataset, so there
-# is a large chanse that the best subset is found in the first generation
+# is a large chance that the best subset is found in the first generation
 data = sm.datasets.longley.load_pandas()
 X = sm.add_constant(data.exog)
 y = data.endog
