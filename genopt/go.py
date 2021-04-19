@@ -1,6 +1,5 @@
 import logging
 from typing import Callable, Tuple
-import sys
 
 import numpy as np
 
@@ -14,6 +13,7 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(name)s - %(message)s"
 )
 LOGGER = logging.getLogger(__name__)
+
 
 # pylint: disable=R0902
 class GeneticOptimizer:
