@@ -1,8 +1,10 @@
+from typing import Callable, Tuple
 import numpy as np
-from numpy.core.fromnumeric import var
 
 
-def decode_discrete(population, n_vars, var_range, var_size):
+def decode_discrete(
+    population: np.ndarray, n_vars: int, var_range: Tuple[float], var_size: int
+) -> float:
     # Special case where there is no need to decode
     if var_range[0] == 0 and var_range[1] == 1 and var_size == 1:
         return population
@@ -29,9 +31,8 @@ def decode_discrete(population, n_vars, var_range, var_size):
     return decoded
 
 
-def evaluate(variables, objective_function):
+def evaluate(variables: np.ndarray, objective_function: Callable) -> np.ndarray:
     variables = np.atleast_2d(variables.copy())
     popsize = variables.shape[0]
     fitness = [objective_function(variables[i, :]) for i in range(popsize)]
-    i_max = np.argmax(fitness)
-    return np.array(fitness), i_max
+    return np.array(fitness)

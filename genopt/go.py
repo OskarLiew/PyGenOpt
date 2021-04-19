@@ -1,5 +1,7 @@
-from typing import Callable, Tuple
 import logging
+from typing import Callable, Tuple
+import sys
+
 import numpy as np
 
 from genopt.crossover import one_way_crossover
@@ -8,6 +10,9 @@ from genopt.mutation import mutation_discrete, mutation_real
 from genopt.population import init_discrete, init_real, update_population
 from genopt.selection import tournament_selection
 
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(name)s - %(message)s"
+)
 LOGGER = logging.getLogger(__name__)
 
 # pylint: disable=R0902
@@ -56,7 +61,6 @@ class GeneticOptimizer:
         """
 
         # Assertions
-        assert popsize % 2 == 0, "Popsize should be an even number"
         assert encoding in [
             "discrete",
             "real",
@@ -70,7 +74,6 @@ class GeneticOptimizer:
             ), "Variable size must be an integer larger than 0"
 
         self.n_vars = n_vars
-        self.popsize = popsize
         self.objective_function = objective_function
         self.t_sel_p = t_sel_p
         self.t_sel_size = t_sel_size
@@ -86,16 +89,16 @@ class GeneticOptimizer:
             self.mut_p = mut_p
         self.mut_var = mut_var
         self.elitism = elitism
-        self.fitness = np.zeros(self.popsize)
+        self.fitness = np.zeros(popsize)
         self.top_individual = None
 
         # Initialize population
         if encoding == "real":
-            self.population = init_real(self.popsize, self.n_vars)
+            self.population = init_real(popsize, self.n_vars)
         else:
-            self.population = init_discrete(self.popsize, self.n_vars, self.var_size)
+            self.population = init_discrete(popsize, self.n_vars, self.var_size)
 
-    def optimize(self, n_gen: int):
+    def optimize(self, n_gen: int) -> np.ndarray:
         """Run the genetic optimizer for n_gen generations and return the
         top individual of the population
 
@@ -108,7 +111,8 @@ class GeneticOptimizer:
         for i in range(n_gen):
 
             # Evaluate population
-            self.fitness, i_max = self.evaluate(self.population)
+            self.fitness = self.evaluate(self.population)
+            i_max = np.argmax(self.fitness)
             self.top_individual = self.population[i_max, :]
 
             # Selection
@@ -175,10 +179,11 @@ class GeneticOptimizer:
             np.ndarray: Population after selection
         """
         return tournament_selection(
-            population, self.fitness, self.popsize, self.t_sel_p, self.t_sel_size
+            population, self.fitness, self.t_sel_p, self.t_sel_size
         )
 
-    def crossover(self, population: np.ndarray) -> np.ndarray:
+    @staticmethod
+    def crossover(population: np.ndarray) -> np.ndarray:
         """Mix the chromosomes of the population
 
         Args:
@@ -188,7 +193,7 @@ class GeneticOptimizer:
         Returns:
             np.ndarray: Population after crossover
         """
-        return one_way_crossover(population, self.n_vars, self.popsize)
+        return one_way_crossover(population)
 
     def mutate(self, population: np.ndarray) -> np.ndarray:
         """Mutate the population to introduce new chromosomes to the pool

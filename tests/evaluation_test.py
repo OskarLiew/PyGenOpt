@@ -36,8 +36,9 @@ def test_decode_discrete_special_case():
 def test_evaluate_single_chromosome():
     n_vars = 10
     variables = np.random.rand(n_vars)
-    y, i_max = evaluate(variables, objective)
-    assert y[0] == objective(variables)
+    fitness = evaluate(variables, objective)
+    i_max = np.argmax(fitness)
+    assert fitness[0] == objective(variables)
     assert i_max == 0
 
 
@@ -46,5 +47,6 @@ def test_evaluate_population():
     popsize = 25
     variables = np.random.rand(popsize, n_vars)
     variables[-1, :] = 1
-    _, i_max = evaluate(variables, objective)
+    fitness = evaluate(variables, objective)
+    i_max = np.argmax(fitness)
     assert i_max == popsize - 1
