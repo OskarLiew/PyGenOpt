@@ -14,4 +14,4 @@ Package will be uploaded to PyPi repository later.
 
 ## Usage
 
-Read the documentation [here](https://pygenopt.readthedocs.io/en/latest/index.html)
+Check out [this example](https://pygenopt.readthedocs.io/en/latest/content/example.html) on how PyGenOpt can be used to select variables for a multiple linear regression model.
