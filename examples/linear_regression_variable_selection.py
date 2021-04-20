@@ -6,21 +6,19 @@ import pandas as pd
 from genopt import GeneticOptimizer
 
 
-# Helper function to get the columns defined by the chromosome
-def get_x_subset(chromosome, x_data):
-    mask = chromosome.astype(bool)
-    return x_data.iloc[:, mask]
+# Helper function to fit a regression model after a chromosome
+def linear_regression_fit_chromosome(chromosome, x_data, targets):
+    x_subset = x_data.iloc[:, chromosome.astype(bool)]
+    regression_model = sm.OLS(targets, x_subset)
+    return regression_model.fit()
 
 
-# Objective function to optimize
+# Objective function to maximize
 def linear_regression_minimize_bic(chromosome, x_data, targets):
     if np.all(chromosome == 0):
         return -1e9
 
-    x_subset = get_x_subset(chromosome, x_data)
-    regression_model = sm.OLS(targets, x_subset)
-    results = regression_model.fit()
-
+    results = linear_regression_fit_chromosome(chromosome, x_data, targets)
     return -results.bic
 
 
@@ -45,9 +43,7 @@ def main():
     best_chromosome = optimizer.optimize(10)
 
     # Show results of optimization
-    x_subset = get_x_subset(best_chromosome, x_data)
-    regression_model = sm.OLS(targets, x_subset)
-    results = regression_model.fit()
+    results = linear_regression_fit_chromosome(best_chromosome, x_data, targets)
     print(results.summary())
 
 

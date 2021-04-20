@@ -10,7 +10,7 @@ To install from source code:
 
 `pip install PyGenOpt/`
 
-Package might be uploaded to PyPi repository later.
+Package will be uploaded to PyPi repository later.
 
 ## Usage
 
@@ -25,46 +25,47 @@ import pandas as pd
 from genopt import GeneticOptimizer
 
 
-# Helper function to get the columns defined by the chromosome
-def get_X_subset(chromosome, X):
-    mask = chromosome.astype(bool)
-    return X.iloc[:, mask]
+# Helper function to fit a regression model after a chromosome
+def linear_regression_fit_chromosome(chromosome, x_data, targets):
+    x_subset = x_data.iloc[:, chromosome.astype(bool)]
+    regression_model = sm.OLS(targets, x_subset)
+    return regression_model.fit()
 
 
-# Objective function to optimize
-def linear_regression_minimize_bic(chromosome, X, y):
+# Objective function to maximize
+def linear_regression_minimize_bic(chromosome, x_data, targets):
     if np.all(chromosome == 0):
         return -1e9
 
-    X_subset = get_X_subset(chromosome, X)
-    lr = sm.OLS(y, X_subset)
-    results = lr.fit()
-
+    results = linear_regression_fit_chromosome(chromosome, x_data, targets)
     return -results.bic
 
 
-# Load Boston housing dataset
-data = datasets.load_boston()
-X = pd.DataFrame(data=data["data"], columns=data["feature_names"])
-y = data["target"]
+def main():
+    # Load Boston housing dataset
+    data = datasets.load_boston()
+    x_data = pd.DataFrame(data=data["data"], columns=data["feature_names"])
+    targets = data["target"]
 
-# Setup GeneticOptimizer
-go = GeneticOptimizer(
-    n_vars=X.shape[1],
-    popsize=100,
-    n_gen=10,
-    objective_function=partial(linear_regression_minimize_bic, X=X, y=y),
-    encoding="discrete",
-    var_range=(0, 1),
-    var_size=1,
-)
+    # Setup GeneticOptimizer
+    optimizer = GeneticOptimizer(
+        n_vars=x_data.shape[1],
+        popsize=100,
+        objective_function=partial(
+            linear_regression_minimize_bic, x_data=x_data, targets=targets
+        ),
+        encoding="discrete",
+        var_range=(0, 1),
+        var_size=1,
+    )
 
-best_chromosome = go.optimize()
+    best_chromosome = optimizer.optimize(10)
 
-# Show results of optimization
-X_subset = get_X_subset(best_chromosome, X)
-lr = sm.OLS(y, X_subset)
-results = lr.fit()
-print(results.summary())
+    # Show results of optimization
+    results = linear_regression_fit_chromosome(best_chromosome, x_data, targets)
+    print(results.summary())
 
+
+if __name__ == "__main__":
+    main()
 ```

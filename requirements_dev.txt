@@ -3,3 +3,6 @@ pylint
 flake8
 black
 setuptools
+sphinx
+sphinx-rtd-theme
+sphinx-copybutton

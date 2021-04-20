@@ -23,3 +23,10 @@ def test_update_population():
     assert (new_population[0, :] == top_individual).all()
     assert (new_population[1, :] == top_individual).all()
     assert (new_population[2, :] != top_individual).all()
+
+
+def test_update_population_no_elitism():
+    top_individual = np.ones(10)
+    population = init_real(25, 10)
+    new_population = update_population(population, top_individual, 0)
+    assert (new_population[0, :] != top_individual).all()

@@ -17,6 +17,35 @@ LOGGER = logging.getLogger(__name__)
 
 # pylint: disable=R0902
 class GeneticOptimizer:
+    """Maximize the function ``objective_function`` using genetic optimization.
+    Supports real and discrete encoded variables.
+
+    Args:
+        n_vars (int): Number of variables
+        popsize (int): Population size, i.e number of chromosomes.
+            Needs to be an even number.
+        objective_function (callable): Function to optimize for. Takes
+            the decoded variables as input and returns a fitness. The
+            genetic optimizer will then try to maximize the fitness.
+        t_sel_p (float, optional): Probability of the fittest individual
+            to win a tournament. Defaults to 0.7.
+        t_sel_size (int, optional): Tournament size. Defaults to 1.
+        mut_p (float, optional): Mutation probability, set to
+            1/(n_vars*var_size) if None. Defaults to None.
+        mut_var (int, optional): Mutation variance for real encoded
+            variables. Does nothing if encoding='discrete'. Defaults to 1.
+        encoding (str, optional): Type of variable encoding. Can be 'real'
+            or 'discrete'. Defaults to 'real'.
+        var_range (tuple, optional): Range of discrete variables. Does
+            nothing if encoding='real'. Defaults to (0, 1).
+        var_size (int, optional): Number of genes for each discrete
+            variables. Multiplicatively increases chromosome length.
+            Does nothing if encoding='real'. Defaults to 1.
+        elitism (int, optional): Number of copies of the best
+            (maximum fitness) to transfer to the next generation.
+            Defaults to 1.
+    """
+
     def __init__(
         self,
         n_vars: int,
@@ -31,34 +60,6 @@ class GeneticOptimizer:
         var_size: int = 1,
         elitism: int = 1,
     ):
-        """Maximize the function ``objective_function`` using genetic optimization.
-        Supports real and discrete encoded variables.
-
-        Args:
-            n_vars (int): Number of variables
-            popsize (int): Population size, i.e number of chromosomes.
-                Needs to be an even number.
-            objective_function (callable): Function to optimize for. Takes
-                the decoded variables as input and returns a fitness. The
-                genetic optimizer will then try to maximize the fitness.
-            t_sel_p (float, optional): Probability of the fittest individual
-                to win a tournament. Defaults to 0.7.
-            t_sel_size (int, optional): Tournament size. Defaults to 1.
-            mut_p (float, optional): Mutation probability, set to
-                1/(n_vars*var_size) if None. Defaults to None.
-            mut_var (int, optional): Mutation variance for real encoded
-                variables. Does nothing if encoding='discrete'. Defaults to 1.
-            encoding (str, optional): Type of variable encoding. Can be 'real'
-                or 'discrete'. Defaults to 'real'.
-            var_range (tuple, optional): Range of discrete variables. Does
-                nothing if encoding='real'. Defaults to (0, 1).
-            var_size (int, optional): Number of genes for each discrete
-                variables. Multiplicatively increases chromosome length.
-                Does nothing if encoding='real'. Defaults to 1.
-            elitism (int, optional): Number of copies of the best
-                (maximum fitness) to transfer to the next generation.
-                Defaults to 1.
-        """
 
         # Assertions
         assert encoding in [
@@ -132,11 +133,11 @@ class GeneticOptimizer:
         return self.top_individual
 
     def decode(self, population: np.ndarray) -> np.ndarray:
-        """Decode binary chromosomes to real arrays
+        """Decode binary chromosomes to an array of discrete values
 
         Args:
-            population (np.ndarray): Population as a 2d array of shape
-                (popsize, n_vars * var_size)
+            population (np.ndarray): Population of binary chromosomes as a 2d
+                array of shape (popsize, n_vars * var_size)
 
         Returns:
             np.ndarray: Decoded population as 2d array of shape (popsize, n_vars)
@@ -206,11 +207,9 @@ class GeneticOptimizer:
             np.ndarray: Population after mutation
         """
         if self.encoding == "real":
-            return mutation_real(population, self.n_vars, self.mut_p, self.mut_var)
+            return mutation_real(population, self.mut_p, self.mut_var)
 
         return mutation_discrete(
             population,
-            self.n_vars,
             self.mut_p,
-            self.var_size,
         )

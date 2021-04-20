@@ -2,6 +2,15 @@ import numpy as np
 
 
 def one_way_crossover(population: np.ndarray) -> np.ndarray:
+    """Produce child chomosomes from pairs of parent chromosomes by swapping
+    the chromosomes to the right of a randomly selected index.
+
+    Args:
+        population (np.ndarray): Parent population
+
+    Returns:
+        np.ndarray: Child population
+    """
     new_population = np.atleast_2d(population.copy())
     popsize, chromosome_length = new_population.shape
     for j in np.arange(popsize - 1, step=2):
